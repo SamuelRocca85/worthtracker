@@ -1,10 +1,9 @@
 class Provider::Frankfurter < Provider
-  include ExchangeRateConcept, SecurityConcept
+  include ExchangeRateConcept
 
   # Subclass so errors caught in this provider are raised as Provider::Frankfurter::Error
   Error = Class.new(Provider::Error)
   InvalidExchangeRateError = Class.new(Error)
-  InvalidSecurityPriceError = Class.new(Error)
 
   # ================================
   #          Exchange Rates
@@ -12,10 +11,8 @@ class Provider::Frankfurter < Provider
 
   def fetch_exchange_rate(from:, to:, date:)
     with_provider_response do
-      response = client.get("#{base_url}/v2/rates") do |req|
-        req.params["base"] = from
-        req.params["quotes"] = to
-        req.params["from"] = date
+      response = client.get("#{base_url}/v2/rate/#{from}/#{to}") do |req|
+        req.params["date"] = date.to_s
       end
 
       rate = JSON.parse(response.body).dig("rate")
@@ -28,14 +25,14 @@ class Provider::Frankfurter < Provider
 
   def fetch_exchange_rates(from:, to:, start_date:, end_date:)
     with_provider_response do
-      data = client.get("#{base_url}/v2/rates") do |req|
+      response = client.get("#{base_url}/v2/rates") do |req|
         req.params["base"] = from
         req.params["quotes"] = to
         req.params["from"] = start_date.to_s
         req.params["to"] = end_date.to_s
       end
 
-      data.map do |rate|
+      JSON.parse(response.body).map do |rate|
         date = rate.dig("date")
         rate = rate.dig("rate")
 
