@@ -40,6 +40,10 @@ class Provider::Registry
         Provider::Synth.new(api_key)
       end
 
+      def frankfurter
+        Provider::Frankfurter.new()
+      end
+
       def plaid_us
         config = Rails.application.config.plaid
 
@@ -92,13 +96,13 @@ class Provider::Registry
     def available_providers
       case concept
       when :exchange_rates
-        %i[synth]
+        %i[frankfurter]
       when :securities
         %i[synth]
       when :llm
         %i[openai]
       else
-        %i[synth plaid_us plaid_eu github openai]
+        %i[frankfurter synth plaid_us plaid_eu github openai]
       end
     end
 end
