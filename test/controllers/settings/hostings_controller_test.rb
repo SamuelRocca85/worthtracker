@@ -1,37 +1,22 @@
 require "test_helper"
-require "ostruct"
 
 class Settings::HostingsControllerTest < ActionDispatch::IntegrationTest
-  include ProviderTestHelper
-
   setup do
     sign_in users(:family_admin)
-
-    @provider = mock
-    Provider::Registry.stubs(:get_provider).with(:synth).returns(@provider)
-    @usage_response = provider_success_response(
-      OpenStruct.new(
-        used: 10,
-        limit: 100,
-        utilization: 10,
-        plan: "free",
-      )
-    )
   end
 
   test "cannot edit when self hosting is disabled" do
-    with_env_overrides SELF_HOSTED: "false" do
-      get settings_hosting_url
-      assert_response :forbidden
+    # app_mode is resolved from ENV at boot, so it has to be stubbed rather than overriding ENV here
+    Rails.configuration.stubs(:app_mode).returns("managed".inquiry)
 
-      patch settings_hosting_url, params: { setting: { require_invite_for_signup: true } }
-      assert_response :forbidden
-    end
+    get settings_hosting_url
+    assert_response :forbidden
+
+    patch settings_hosting_url, params: { setting: { require_invite_for_signup: true } }
+    assert_response :forbidden
   end
 
   test "should get edit when self hosting is enabled" do
-    @provider.expects(:usage).returns(@usage_response)
-
     with_self_hosting do
       get settings_hosting_url
       assert_response :success
@@ -39,10 +24,13 @@ class Settings::HostingsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "can update settings when self hosting is enabled" do
-    with_self_hosting do
-      patch settings_hosting_url, params: { setting: { synth_api_key: "1234567890" } }
+    Setting.require_invite_for_signup = false
 
-      assert_equal "1234567890", Setting.synth_api_key
+    with_self_hosting do
+      patch settings_hosting_url, params: { setting: { require_invite_for_signup: true } }
+
+      assert_redirected_to settings_hosting_url
+      assert_equal true, Setting.require_invite_for_signup
     end
   end
 

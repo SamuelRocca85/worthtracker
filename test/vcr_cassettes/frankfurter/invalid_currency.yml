@@ -1,0 +1,49 @@
+---
+http_interactions:
+- request:
+    method: get
+    uri: https://api.frankfurter.dev/v2/rates?base=USD&from=2024-01-01&quotes=XYZ&to=2024-01-05
+    body:
+      encoding: US-ASCII
+      string: ''
+    headers:
+      User-Agent:
+      - Faraday v2.13.2
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 422
+      message: Unprocessable Entity
+    headers:
+      Date:
+      - Fri, 06 Nov 2026 23:10:10 GMT
+      Content-Type:
+      - application/json; charset=utf-8
+      Content-Length:
+      - '48'
+      Connection:
+      - keep-alive
+      Vary:
+      - Origin
+      X-Robots-Tag:
+      - noindex
+      Cache-Control:
+      - no-store
+      Cf-Cache-Status:
+      - BYPASS
+      Nel:
+      - '{"report_to":"cf-nel","success_fraction":0.0,"max_age":604800}'
+      Report-To:
+      - '{"group":"cf-nel","max_age":604800,"endpoints":[{"url":"https://a.nel.cloudflare.com/report/v4?s=5mdRM0bTCKQuCzPJWTu4Qq6XAAZk0roewDpZfY2VnIQq4oB3awIwPKCWPrD5zSDnFd1puZ1A7xB%2FqcpZZXUybsT73DQbmCfh92kokTGhoGdimQjZiXk1hnKzTTzwVAtfFHtIMF8%3D"}]}'
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - a567c5224eb8ce07-MIA
+    body:
+      encoding: UTF-8
+      string: '{"status":422,"message":"invalid currency: XYZ"}'
+  recorded_at: Fri, 06 Nov 2026 23:10:10 GMT
+recorded_with: VCR 6.3.1
